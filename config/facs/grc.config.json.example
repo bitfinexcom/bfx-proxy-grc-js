@@ -1,0 +1,10 @@
+{
+  "p0": {
+    "grape": "ws://127.0.0.1:30001",
+    "transport": "http"
+  },
+  "p1": {
+    "grape": "ws://127.0.0.1:30001",
+    "transport": "http"
+  }
+}
