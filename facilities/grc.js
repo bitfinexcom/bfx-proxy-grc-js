@@ -3,7 +3,6 @@
 const _ = require('lodash')
 const async = require('async')
 const GrBase = require('grenache-nodejs-base')
-const GrWs = require('grenache-nodejs-ws')
 const GrHttp = require('grenache-nodejs-http')
 const Facility = require('./base/base')
 
@@ -13,6 +12,10 @@ class GrcFacility extends Facility {
 
     this.name = 'grc'
     this._hasConf = true
+
+    if (!this.opts.tickInterval) {
+      this.opts.tickInterval = 5000
+    }
 
     this.init()
   }
@@ -34,7 +37,8 @@ class GrcFacility extends Facility {
       next => {
         this.link = new GrBase.Link({
           grape: this.conf.grape,
-          lruMaxAgeLookup: this.opts.lruMaxAgeLookup || 10000
+          requestTimeout: this.opts.linkRequestTimeout || 2500,
+          lruMaxAgeLookup: this.opts.linkRruMaxAgeLookup || 10000
         })
 
         this.link.start()
@@ -44,11 +48,17 @@ class GrcFacility extends Facility {
 
         switch (this.conf.transport) {
           case 'http':
-            this.peer = new GrHttp.PeerRPCClient(this.link, {})
-            this.peer_srv = new GrHttp.PeerRPCServer(this.link, {})
+            this.peer = new GrHttp.PeerRPCClient(this.link, {
+              maxActiveKeyDests: this.opts.maxActiveKeyDests
+            })
+            this.peer_srv = new GrHttp.PeerRPCServer(this.link, {
+              timeout: this.opts.server_timeout || 600000
+            })
             break
           case 'ws':
-            this.peer = new GrWs.PeerRPCClient(this.link, {})
+            this.peer = new GrWs.PeerRPCClient(this.link, {
+              maxActiveKeyDests: this.opts.maxActiveKeyDests
+            })
             this.peer_srv = new GrWs.PeerRPCServer(this.link, {})
             break
         }
@@ -59,7 +69,7 @@ class GrcFacility extends Facility {
 
           this._tickItv = setInterval(() => {
             this.tick()
-          }, 7500)
+          }, this.opts.tickInterval)
         }
 
         next()
@@ -68,15 +78,32 @@ class GrcFacility extends Facility {
   }
 
   tick () {
-    const pubServices = _.isArray(this.opts.services) && this.opts.services.length ? this.opts.services : null
+    const now = Date.now()
+
+    if (this._ticking) {
+      if (now - this._ticking > 30000) {
+        console.error('WARN_TICKING_STUCK')
+      }
+      return
+    }
+
+    this._ticking = now
+
+    let pubServices = this.opts.services
+    if (!_.isArray(pubServices) || !pubServices.length) pubServices = null
+
     if (this.service && !pubServices) {
       this.service.stop()
       this.service.removeListener('request', this.onRequest.bind(this))
       delete this.service
+      this._ticking = null
       return
     }
 
-    if (!pubServices || !this.opts.svc_port) return
+    if (!pubServices || !this.opts.svc_port) {
+      this._ticking = null
+      return
+    }
 
     const port = this.opts.svc_port
 
@@ -86,11 +113,21 @@ class GrcFacility extends Facility {
       this.service.on('request', this.onRequest.bind(this))
     }
 
-    _.each(pubServices, srv => {
-      this.link.announce(srv, port, {}, (err) => {
-        if (err) console.error(err)
-        // console.log('grc:announce', srv, port, err)
-      })
+    async.auto({
+      announce: next => {
+        async.eachSeries(pubServices, (srv, next) => {
+          const t1 = Date.now()
+          this.link.announce(srv, port, {}, (err) => {
+            if (err) console.error(err)
+            const tdiff = Date.now() - t1
+            if  (tdiff > 2500) console.error('ANNOUNCE', srv, port, 'took too long', tdiff)
+            //console.log('grc:announce', srv, port, err)
+            next()
+          })
+        }, next)
+      }
+    }, err => {
+      this._ticking = null
     })
   }
 
