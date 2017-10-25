@@ -1,19 +1,15 @@
 'use strict'
 
-const WrkApi = require('./api.wrk')
+const async = require('async')
+const _ = require('lodash')
+const { WrkApi } = require('bfx-wrk-api')
 
 class WrkProxyApi extends WrkApi {
-  getPluginCtx (type) {
-    const ctx = super.getPluginCtx(type)
 
-    switch (type) {
-      case 'api_bfx_main':
-        ctx.grc_bfx = this.grc_bfx
-        break
-    }
-
-    return ctx
+  init () {
+    super.init()
   }
+
 }
 
 module.exports = WrkProxyApi
