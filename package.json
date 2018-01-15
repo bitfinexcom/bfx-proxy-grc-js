@@ -1,8 +1,14 @@
 {
+<<<<<<< HEAD
   "name": "bfx-proxy-js",
   "version": "0.0.1",
   "private": true,
   "description": "Bitfinex Proxy Service",
+=======
+  "name": "bfx-svc-js",
+  "version": "0.0.5",
+  "description": "Bitfinex Base Service",
+>>>>>>> upstream/master
   "author": {
     "name": "prdn",
     "email": "paolo@bitfinex.com"
@@ -12,11 +18,17 @@
   ],
   "dependencies": {
     "async": "^2.5.0",
+<<<<<<< HEAD
     "bfx-facs-api": "git+https://github.com/bitfinexcom/bfx-facs-api.git",
     "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
     "bfx-facs-interval": "https://github.com/bitfinexcom/bfx-facs-interval.git",
     "bfx-svc-boot-js": "https://github.com/bitfinexcom/bfx-svc-boot-js.git",
     "bfx-wrk-api": "git+https://github.com/bitfinexcom/bfx-wrk-api.git",
+=======
+    "bfx-facs-base": "git+https://github.com/bitfinexcom/bfx-facs-base.git",
+    "bfx-facs-interval": "https://github.com/bitfinexcom/bfx-facs-interval.git",
+    "bfx-svc-boot-js": "https://github.com/bitfinexcom/bfx-svc-boot-js.git",
+>>>>>>> upstream/master
     "bfx-wrk-base": "git+https://github.com/bitfinexcom/bfx-wrk-base.git",
     "lodash": "^4.17.4",
     "yargs": "^6.3.0"
@@ -24,10 +36,17 @@
   "engine": {
     "node": ">=8.0"
   },
+<<<<<<< HEAD
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bitfinexcom/bfx-proxy-js.git"
+=======
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitfinexcom/bfx-svc-js.git"
+>>>>>>> upstream/master
   },
   "maintainers": [
     {
