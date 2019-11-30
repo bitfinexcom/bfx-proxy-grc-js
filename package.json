@@ -1,8 +1,8 @@
 {
-  "name": "bfx-proxy-js",
+  "name": "bfx-proxy-grc-js",
   "version": "0.0.1",
   "private": true,
-  "description": "Bitfinex Proxy Service",
+  "description": "Bitfinex Proxy Grenache Service",
   "author": {
     "name": "prdn",
     "email": "paolo@bitfinex.com"
@@ -27,7 +27,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitfinexcom/bfx-proxy-js.git"
+    "url": "git+https://github.com/bitfinexcom/bfx-proxy-grc-js.git"
   },
   "maintainers": [
     {
